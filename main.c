@@ -75,7 +75,39 @@ int TreeHeight(BTNode *root) {
 
 ///求第k层的节点个数
 int TreeKLevel(BTNode *root, int k) {
+    assert(k > 0);
 
+    if (root == NULL)
+        return 0;
+    if (k == 1)
+        return 1;
+    return TreeKLevel(root->left, k - 1) + TreeKLevel(root->right, k - 1);
+}
+
+///返回x所在的节点
+BTNode *TreeFind(BTNode *root, BTDataType x) {
+    if (root == NULL)
+        return NULL;
+    if (root->data == x)
+        return root;
+    ///先去左树找
+    BTNode *lret = TreeFind(root->left, x);
+    if (lret)
+        return lret;
+    ///左树没有找到再去右树找
+    BTNode *rret = TreeFind(root->right, x);
+    if (rret)
+        return rret;
+
+    return NULL;
+}
+
+void BinaryTreeDestroy(BTNode *root) {
+    if(root == NULL)
+        return;
+    BinaryTreeDestroy(root->left);
+    BinaryTreeDestroy(root->right);
+    free(root);
 }
 
 BTNode *CreatTree() {
@@ -140,6 +172,13 @@ int main() {
     printf("Leaf Size:%d\n", TreeLeaSize(root));
 
     printf("Tree Height:%d\n", TreeHeight(root));
+
+    printf("Tree K Level:%d\n", TreeKLevel(root, 4));
+
+    printf("Tree Find:%p\n", TreeFind(root, 3));
+
+    BinaryTreeDestroy(root);
+    root = NULL;
 
     return 0;
 }
