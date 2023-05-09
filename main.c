@@ -1,13 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
-typedef int BTDataType;
-typedef struct BinaryTreeNode {
-    BTDataType data;
-    struct BinaryTreeNode *left;
-    struct BinaryTreeNode *right;
-} BTNode;
+#include "queue.h"
 
 ///二叉树前序遍历
 void PreOrder(BTNode *root) {
@@ -37,6 +31,71 @@ void PostOrder(BTNode *root) {
     PostOrder(root->left);
     PostOrder(root->right);
     printf("%d ", root->data);
+}
+
+///二叉树层序遍历
+void TreeLevelOrder(BTNode* root)
+{
+    Queue q;
+    QueueInit(&q);
+    if (root)
+        QueuePush(&q, root);
+
+    while (!QueueEmpty(&q))
+    {
+        BTNode* front = QueueFront(&q);
+        QueuePop(&q);
+        printf("%d ", front->data);
+
+        /// 下一层，入队列
+        if (front->left)
+            QueuePush(&q, front->left);
+
+        if (front->right)
+            QueuePush(&q, front->right);
+    }
+    printf("\n");
+
+    QueueDestroy(&q);
+}
+
+///判断一棵树是否是完全二叉树
+int BinaryTreeComplete(BTNode* root)
+{
+    Queue q;
+    QueueInit(&q);
+    if (root)
+        QueuePush(&q, root);
+
+    while (!QueueEmpty(&q))
+    {
+        BTNode* front = QueueFront(&q);
+        QueuePop(&q);
+
+        if (front == NULL)
+        {
+            break;
+        }
+
+        QueuePush(&q, front->left);
+        QueuePush(&q, front->right);
+    }
+
+    // 遇到空以后，后面全是空，则是完全二叉树
+    // 遇到空以后，后面存在非空，则不是完全二叉树
+    while (!QueueEmpty(&q))
+    {
+        BTNode* front = QueueFront(&q);
+        QueuePop(&q);
+        if (front != NULL)
+        {
+            QueueDestroy(&q);
+            return false;
+        }
+    }
+
+    QueueDestroy(&q);
+    return true;
 }
 
 //遍历计数的方式
@@ -166,6 +225,8 @@ int main() {
 
     PostOrder(root);
     printf("\n");
+
+    TreeLevelOrder(root);
 
     printf("Tree Size:%d\n", TreeSize(root));
 
